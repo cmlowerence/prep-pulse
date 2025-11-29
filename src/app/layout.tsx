@@ -1,29 +1,26 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import AuthProvider from "@/components/auth/AuthProvider";
 import { cn } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "PrepPulse - TGT Exam Tracker",
-  description: "AI-Powered Syllabus Tracking and Exam Preparation",
+  title: "Prep-Pulse | AI Study Companion",
+  description: "Master your TGT Science exams with AI-powered study plans.",
 };
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
     <html lang="en">
-      <body className={cn(inter.className, "min-h-screen bg-slate-50 dark:bg-slate-900")}>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+      <body className={cn("min-h-screen bg-background font-sans antialiased", inter.className)}>
+        {/* We will add AuthProvider/ThemeProviders here later */}
+        {children}
       </body>
     </html>
   );
 }
-
