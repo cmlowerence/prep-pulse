@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./globals.css";
-import { cn } from "@/lib/utils";
+import { ClerkProvider } from "@clerk/nextjs";
+
+// Import the global styles we created in Stage 1
+import "@/styles/globals.css";
+import "@/styles/katex.css";
+import "@/styles/overrides.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Prep-Pulse | AI Study Companion",
-  description: "Master your TGT Science exams with AI-powered study plans.",
+  title: "PrepPulse | AI Exam Prep",
+  description: "Master your TGT Science exam with AI-powered study guides and quizzes.",
 };
 
 export default function RootLayout({
@@ -16,11 +20,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={cn("min-h-screen bg-background font-sans antialiased", inter.className)}>
-        {/* We will add AuthProvider/ThemeProviders here later */}
-        {children}
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en" suppressHydrationWarning>
+        <body className={`${inter.className} min-h-screen bg-background antialiased`}>
+          {children}
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

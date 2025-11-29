@@ -1,26 +1,22 @@
-import { TGT_SCIENCE_SYLLABUS } from "@/data/syllabi/tgt-science-2025";
-import { Subject, Topic } from "@/types";
+import { CURRENT_SYLLABUS } from '@/data';
+import { useProgress } from './use-progress';
 
 export function useSyllabus() {
-  const syllabus = TGT_SCIENCE_SYLLABUS;
+  const { progress } = useProgress();
 
-  const getSubjectById = (id: string): Subject | undefined => {
-    return syllabus.subjects.find((s) => s.id === id);
-  };
-
-  const getTopicById = (id: string): { topic: Topic; subject: Subject } | null => {
-    for (const subject of syllabus.subjects) {
-      const topic = subject.topics.find((t) => t.id === id);
-      if (topic) {
-        return { topic, subject };
-      }
-    }
-    return null;
+  const getTopicStatus = (topicId: string) => {
+    // Assuming progress data returns { topic_id: string, completed: boolean }
+    // We map the raw topic string/id to the progress
+    // In a real app, ensure IDs match perfectly.
+    const found = progress.find((p: any) => p.topic_id === topicId);
+    return {
+      completed: found?.completed || false,
+      score: found?.score || 0
+    };
   };
 
   return {
-    syllabus,
-    getSubjectById,
-    getTopicById
+    syllabus: CURRENT_SYLLABUS,
+    getTopicStatus
   };
 }

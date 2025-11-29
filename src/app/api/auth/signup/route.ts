@@ -1,34 +1,28 @@
 import { NextResponse } from "next/server";
-import { hash } from "bcrypt";
-import { sql } from "@/lib/db";
+import { db } from "@/lib/db";
+import { logger } from "@/lib/logger";
 
-// Handle User Registration
 export async function POST(req: Request) {
   try {
-    const { email, password, name } = await req.json();
+    const { userId, email } = await req.json();
 
-    if (!email || !password || !name) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    if (!userId || !email) {
+      return NextResponse.json({ error: "Missing data" }, { status: 400 });
     }
 
-    // 1. Check if user already exists in Postgres
-    const existingUser = await sql`SELECT * FROM users WHERE email=${email}`;
-    if (existingUser.rows.length > 0) {
-      return NextResponse.json({ error: "User already exists" }, { status: 400 });
-    }
+    // Sync Clerk user to local Postgres
+    await db.query(`
+      INSERT INTO users (clerk_id, email)
+      VALUES ($1, $2)
+      ON CONFLICT (clerk_id) DO NOTHING
+    `, [userId, email]);
 
-    // 2. Hash the password
-    const hashedPassword = await hash(password, 10);
+    logger.info(`User synced: ${userId}`);
 
-    // 3. Insert into DB
-    await sql`
-      INSERT INTO users (name, email, password)
-      VALUES (${name}, ${email}, ${hashedPassword})
-    `;
+    return NextResponse.json({ success: true });
 
-    return NextResponse.json({ message: "User created successfully" }, { status: 201 });
   } catch (error) {
-    console.error("Signup Error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    logger.error("Signup Sync Error", error);
+    return NextResponse.json({ error: "Sync failed" }, { status: 500 });
   }
 }

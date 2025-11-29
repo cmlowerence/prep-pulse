@@ -1,41 +1,34 @@
-// -------- SYLLABUS TYPES --------
-
-export interface Subtopic {
-  id: string;   // unique subtopic key
-  name: string; // display label
+export interface UserProfile {
+  id: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  createdAt: Date;
 }
 
-export interface Topic {
-  id: string;       // unique topic key
-  name: string;     
-  subtopics: Subtopic[];
-}
-
-export interface Subject {
-  id: string;          // unique subject key
-  name: string;
-  color?: string;      // tailwind text color
-  bgColor?: string;    // tailwind bg color
-  icon?: string;       // optional icon name
-  topics: Topic[];
-}
-
-export interface SyllabusData {
-  id: string;          // syllabus id
-  examName: string;
-  version: string;
-  subjects: Subject[]; // all subjects in exam
-}
-
-// -------- USER PROGRESS TYPES --------
-
-export interface UserProgress {
+export interface StudySession {
+  sessionId: string;
   userId: string;
-  examId: string;
+  subjectId: string; // e.g., "chemistry"
+  sectionId: string; // e.g., "chem_1"
+  topicName: string; // e.g., "Matter & its states"
+  startTime: Date;
+  durationSeconds: number;
+}
 
-  // key format: "topicId-subtopicId"
-  completedSubtopics: Record<string, boolean>;
+export type DifficultyLevel = 'easy' | 'medium' | 'hard';
 
-  totalCompleted: number; // completed count
-  totalSubtopics: number; // total subtopics
+export interface QuizResult {
+  id: string;
+  userId: string;
+  topicName: string; // Storing name since topics are now strings
+  score: number;
+  totalQuestions: number;
+  difficulty: DifficultyLevel;
+  timestamp: Date;
+}
+
+export interface AIStudyGuideResponse {
+  markdownContent: string;
+  generatedAt: Date;
 }

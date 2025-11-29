@@ -1,0 +1,16 @@
+/* Import standard KaTeX styles */
+@import "katex/dist/katex.min.css";
+
+/* Custom overrides for study material readability */
+.katex-display {
+    margin: 1.5em 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 1rem;
+    background-color: var(--secondary);
+    border-radius: var(--radius);
+}
+
+.katex {
+    font-size: 1.1em;
+}

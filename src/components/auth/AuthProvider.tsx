@@ -1,12 +1,12 @@
 "use client";
 
-import { SessionProvider } from "next-auth/react";
+import { ClerkProvider } from "@clerk/nextjs";
 
-export default function AuthProvider({ 
-  children 
-}: { 
-  children: React.ReactNode 
-}) {
-  return <SessionProvider>{children}</SessionProvider>;
-}
-
+// Wrapper if we need to inject custom context later
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <ClerkProvider>
+      {children}
+    </ClerkProvider>
+  );
+};

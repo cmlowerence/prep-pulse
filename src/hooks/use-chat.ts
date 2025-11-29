@@ -1,53 +1,45 @@
-"use client";
-
-import { useState } from "react";
+import { useState } from 'react';
 
 interface Message {
-  role: 'user' | 'ai';
-  text: string;
+  role: 'user' | 'model';
+  parts: string;
 }
 
-export function useChat(topicContext: string) {
+export function useChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const sendMessage = async (message: string) => {
-    if (!message.trim()) return;
-
-    // Add user message immediately
-    const newHistory = [...messages, { role: 'user' as const, text: message }];
-    setMessages(newHistory);
+  const sendMessage = async (content: string) => {
     setIsLoading(true);
     setError(null);
 
+    // Optimistic update
+    const userMsg: Message = { role: 'user', parts: content };
+    const newHistory = [...messages, userMsg];
+    setMessages(newHistory);
+
     try {
-      const res = await fetch('/api/ai/chat', {
+      const response = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message,
-          topicContext,
-          history: messages.slice(-4) // Send last 4 messages for context
+          history: messages,
+          message: content
         })
       });
 
-      if (!res.ok) throw new Error("Failed to fetch response");
-      
-      const data = await res.json();
-      setMessages(prev => [...prev, { role: 'ai', text: data.reply }]);
+      if (!response.ok) throw new Error('Failed to send message');
+
+      const data = await response.json();
+      setMessages([...newHistory, { role: 'model', parts: data.response }]);
     } catch (err) {
-      setError("Failed to connect to AI tutor.");
+      setError('Failed to get response');
       console.error(err);
     } finally {
       setIsLoading(false);
     }
   };
 
-  return {
-    messages,
-    isLoading,
-    error,
-    sendMessage
-  };
+  return { messages, sendMessage, isLoading, error };
 }
